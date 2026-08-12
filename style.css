@@ -1,0 +1,1114 @@
+/* =====================================================================
+   SillyZap — a WhatsApp Web-style skin for SillyTavern
+   ---------------------------------------------------------------------
+   Light-theme replica. Every rule is scoped under `body.wa-skin`, including
+   the chrome index.js injects (#wa-rail / #wa-sidebar / #wa-chat-header),
+   so disabling the skin restores SillyTavern untouched.
+
+   https://github.com/matheusgdqueiroz-del/SillyZap
+   ===================================================================== */
+
+body.wa-skin {
+    /* ---- palette ---- */
+    --wa-font: "Segoe UI", "Helvetica Neue", Helvetica, system-ui, -apple-system, Roboto, Arial, sans-serif;
+
+    --wa-panel: #ffffff;            /* sidebar / list background           */
+    --wa-header-bg: #f0f2f5;        /* panel headers, search, input bar    */
+    --wa-rail-bg: #f7f8fa;          /* far-left icon rail                  */
+    --wa-app-bg: #d9dbd4;           /* behind everything                   */
+    --wa-chat-bg: #efeae2;          /* conversation wallpaper base         */
+
+    --wa-text: #111b21;             /* primary text                        */
+    --wa-text-2: #667781;           /* secondary / preview / meta          */
+    --wa-text-3: #8696a0;           /* tertiary / faint                    */
+    --wa-icon: #54656f;             /* icon buttons                        */
+    --wa-divider: #e9edef;          /* hairline dividers                   */
+    --wa-divider-2: #d1d7db;
+
+    --wa-bubble-in: #ffffff;        /* received bubble                     */
+    --wa-bubble-out: #d9fdd3;       /* sent bubble                         */
+    --wa-meta: #667781;             /* timestamp text                      */
+
+    --wa-green: #00a884;            /* primary accent                      */
+    --wa-green-deep: #008069;       /* darker accent / active filter text  */
+    --wa-green-badge: #25d366;      /* unread count badge                  */
+    --wa-tick-read: #53bdeb;        /* read tick                           */
+
+    --wa-hover: #f5f6f6;            /* list row hover                      */
+    --wa-hover-2: #e1e4e6;          /* icon button hover on grey surfaces  */
+    --wa-active: #f0f2f5;           /* selected list row                   */
+    --wa-chip: #f0f2f5;             /* inactive filter chip                */
+    --wa-chip-active-bg: #d9fdd3;   /* active filter chip                  */
+
+    --wa-shadow: 0 1px 0.5px rgba(11, 20, 26, .13);
+
+    --wa-rail-w: 64px;
+    --wa-list-w: clamp(300px, 30vw, 460px);
+    --wa-left: calc(var(--wa-rail-w) + var(--wa-list-w));
+    --wa-header-h: 60px;
+    --wa-radius: 7.5px;
+
+    /* space reserved on a bubble's last line for the floated timestamp.
+       index.js widens these for 12-hour locales ("10:06 AM"). */
+    --wa-meta-w: 58px;
+    --wa-meta-w-out: 76px;
+
+    font-family: var(--wa-font);
+    background-color: var(--wa-app-bg) !important;
+}
+
+/* Kill the themed background image and blur underneath */
+body.wa-skin #bg1,
+body.wa-skin #bg_custom {
+    background-image: none !important;
+    background-color: var(--wa-app-bg) !important;
+    filter: none !important;
+}
+
+/* Generic font normalisation inside the skin */
+body.wa-skin,
+body.wa-skin #chat,
+body.wa-skin .mes,
+body.wa-skin .mes_text,
+body.wa-skin #send_textarea {
+    font-family: var(--wa-font) !important;
+    text-shadow: none !important;
+}
+
+body.wa-skin .wa-hidden { display: none !important; }
+
+/* =====================================================================
+   SILLYTAVERN'S OWN TOP BAR
+   Hidden by default; revealed as an overlay when body has .wa-show-settings
+   (toggled by the ⋮ in the header, the rail gear, and Esc to hide).
+   ===================================================================== */
+body.wa-skin #top-bar,
+body.wa-skin #top-settings-holder {
+    transition: opacity .15s ease, transform .15s ease;
+}
+body.wa-skin:not(.wa-show-settings) #top-settings-holder {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-100%);
+}
+body.wa-skin:not(.wa-show-settings) #top-bar {
+    opacity: 0;
+    pointer-events: none;
+}
+body.wa-skin.wa-show-settings #top-settings-holder {
+    opacity: 1;
+    z-index: 4000;
+}
+
+/* =====================================================================
+   SHARED: avatars and icon buttons
+   ===================================================================== */
+body.wa-skin .wa-avatar,
+body.wa-skin .wa-rail-avatar,
+body.wa-skin .wa-ch-avatar,
+body.wa-skin .wa-modal-photo {
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #dfe5e7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+body.wa-skin .wa-avatar img,
+body.wa-skin .wa-rail-avatar img,
+body.wa-skin .wa-ch-avatar img,
+body.wa-skin .wa-modal-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Initial / silhouette / group fallbacks fill their circle at any size. */
+body.wa-skin .wa-av-fallback {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 500; line-height: 1;
+    font-size: 0.42em;                 /* scales with the circle, see below */
+    box-sizing: border-box;
+}
+body.wa-skin .wa-av-default { padding: 0; background: transparent; }
+body.wa-skin .wa-av-default svg { display: block; width: 100%; height: 100%; }
+body.wa-skin .wa-av-group { background: #cfd6da; }
+body.wa-skin .wa-av-group i { font-size: 0.85em; }
+
+/* Each avatar wrapper sets its own font-size so the 0.42em above resolves. */
+body.wa-skin .wa-rail-avatar { font-size: 32px; }
+body.wa-skin .wa-ch-avatar { font-size: 40px; }
+body.wa-skin #wa-sidebar .wa-row .wa-avatar { font-size: 49px; }
+body.wa-skin .wa-modal-photo { font-size: 110px; }
+
+body.wa-skin .wa-icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--wa-icon); font-size: 19px; cursor: pointer;
+    transition: background-color .12s ease;
+    flex-shrink: 0;
+}
+
+/* =====================================================================
+   FAR-LEFT ICON RAIL
+   ===================================================================== */
+body.wa-skin #wa-rail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--wa-rail-w);
+    height: 100dvh;
+    background: var(--wa-rail-bg);
+    border-right: 1px solid var(--wa-divider);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 0 12px;
+    gap: 4px;
+    z-index: 45;
+    box-sizing: border-box;
+}
+body.wa-skin #wa-rail .wa-rail-top { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+body.wa-skin #wa-rail .wa-rail-bottom { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+body.wa-skin #wa-rail .wa-rail-btn {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    color: var(--wa-icon);
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color .12s ease;
+}
+body.wa-skin #wa-rail .wa-rail-btn:hover { background: var(--wa-divider); }
+body.wa-skin #wa-rail .wa-rail-btn.active { color: var(--wa-green-deep); }
+body.wa-skin #wa-rail .wa-rail-badge {
+    position: absolute; top: 2px; right: 2px;
+    background: var(--wa-green-badge); color: #fff;
+    min-width: 17px; height: 17px; border-radius: 9px;
+    font-size: 10px; font-weight: 600; line-height: 17px; text-align: center;
+    padding: 0 4px; box-sizing: border-box;
+    border: 2px solid var(--wa-rail-bg);
+}
+body.wa-skin #wa-rail .wa-rail-avatar { width: 32px; height: 32px; cursor: pointer; }
+
+/* =====================================================================
+   SIDEBAR (chat list)
+   ===================================================================== */
+body.wa-skin #wa-sidebar {
+    position: fixed;
+    top: 0;
+    left: var(--wa-rail-w);
+    width: var(--wa-list-w);
+    height: 100dvh;
+    background: var(--wa-panel);
+    border-right: 1px solid var(--wa-divider);
+    display: flex;
+    flex-direction: column;
+    z-index: 44;
+    box-sizing: border-box;
+    color: var(--wa-text);
+}
+
+/* hidden by the "Show the chat list sidebar" option */
+body.wa-skin.wa-no-sidebar { --wa-left: 0px; }
+body.wa-skin.wa-no-sidebar #wa-rail,
+body.wa-skin.wa-no-sidebar #wa-sidebar { display: none; }
+
+/* sidebar header */
+body.wa-skin #wa-sidebar .wa-sb-header {
+    height: var(--wa-header-h);
+    flex-shrink: 0;
+    background: var(--wa-panel);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 0 20px;
+    gap: 8px;
+}
+body.wa-skin #wa-sidebar .wa-sb-title {
+    font-size: 21px; font-weight: 700; color: #1d1f1f; letter-spacing: .2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+body.wa-skin #wa-sidebar .wa-sb-actions { display: flex; align-items: center; gap: 2px; }
+body.wa-skin #wa-sidebar .wa-icon-btn:hover { background: var(--wa-header-bg); }
+
+/* search */
+body.wa-skin #wa-sidebar .wa-search-wrap { padding: 8px 12px 6px; flex-shrink: 0; }
+body.wa-skin #wa-sidebar .wa-search {
+    background: var(--wa-header-bg);
+    border-radius: 8px;
+    height: 35px;
+    display: flex; align-items: center;
+    padding: 0 12px;
+}
+body.wa-skin #wa-sidebar .wa-search .fa-magnifying-glass { color: var(--wa-icon); font-size: 13px; width: 34px; text-align: left; }
+body.wa-skin #wa-sidebar .wa-search input {
+    border: none; background: transparent; outline: none;
+    font-size: 14px; color: var(--wa-text); width: 100%; min-width: 0; font-family: var(--wa-font);
+}
+body.wa-skin #wa-sidebar .wa-search input::placeholder { color: var(--wa-text-2); }
+
+/* filter chips */
+body.wa-skin #wa-sidebar .wa-filters {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 12px 8px; flex-shrink: 0;
+    border-bottom: 1px solid var(--wa-divider);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+body.wa-skin #wa-sidebar .wa-filters::-webkit-scrollbar { display: none; }
+body.wa-skin #wa-sidebar .wa-chip {
+    background: var(--wa-chip); color: #3b4a54;
+    font-size: 14px; height: 32px; line-height: 32px; padding: 0 13px;
+    border-radius: 16px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+body.wa-skin #wa-sidebar .wa-chip.active { background: var(--wa-chip-active-bg); color: var(--wa-green-deep); }
+body.wa-skin #wa-sidebar .wa-chip .wa-chip-count { opacity: .85; }
+
+/* chat list */
+body.wa-skin #wa-sidebar .wa-list { flex: 1; overflow-y: auto; overflow-x: hidden; }
+body.wa-skin #wa-sidebar .wa-archived {
+    display: flex; align-items: center; gap: 22px;
+    padding: 0 24px; height: 52px; cursor: pointer;
+    border-bottom: 1px solid var(--wa-divider);
+    color: var(--wa-text);
+}
+body.wa-skin #wa-sidebar .wa-archived .fa-box-archive { color: var(--wa-green-deep); font-size: 18px; }
+body.wa-skin #wa-sidebar .wa-archived .wa-arch-label { font-size: 14px; }
+
+body.wa-skin #wa-sidebar .wa-row {
+    display: flex; align-items: center; gap: 13px;
+    padding: 0 16px 0 13px; height: 72px; cursor: pointer;
+    position: relative;
+}
+body.wa-skin #wa-sidebar .wa-row:hover { background: var(--wa-hover); }
+body.wa-skin #wa-sidebar .wa-row.active { background: var(--wa-active); }
+body.wa-skin #wa-sidebar .wa-row .wa-avatar { width: 49px; height: 49px; }
+body.wa-skin #wa-sidebar .wa-row .wa-rowbody {
+    flex: 1; min-width: 0; height: 100%;
+    display: flex; flex-direction: column; justify-content: center; gap: 2px;
+    border-top: 1px solid var(--wa-divider);
+}
+/* the archived strip already draws a divider, so the row under it needs none */
+body.wa-skin #wa-sidebar .wa-archived + .wa-row .wa-rowbody,
+body.wa-skin #wa-sidebar .wa-row:first-child .wa-rowbody { border-top: none; }
+body.wa-skin #wa-sidebar .wa-row .wa-row-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+body.wa-skin #wa-sidebar .wa-row .wa-name {
+    font-size: 16px; color: var(--wa-text); font-weight: 400;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+body.wa-skin #wa-sidebar .wa-row .wa-time { font-size: 12px; color: var(--wa-text-2); flex-shrink: 0; }
+body.wa-skin #wa-sidebar .wa-row.unread .wa-time { color: var(--wa-green-badge); }
+body.wa-skin #wa-sidebar .wa-row .wa-row-bot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+body.wa-skin #wa-sidebar .wa-row .wa-preview {
+    font-size: 14px; color: var(--wa-text-2);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0;
+    display: flex; align-items: center; gap: 3px;
+}
+body.wa-skin #wa-sidebar .wa-row .wa-preview > span {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+body.wa-skin #wa-sidebar .wa-row .wa-preview .wa-mini-tick { color: var(--wa-tick-read); flex-shrink: 0; }
+body.wa-skin.wa-no-receipts .wa-mini-tick { display: none; }
+body.wa-skin #wa-sidebar .wa-row .wa-badge {
+    background: var(--wa-green-badge); color: #fff;
+    min-width: 20px; height: 20px; border-radius: 10px;
+    font-size: 12px; font-weight: 500; line-height: 20px; text-align: center;
+    padding: 0 6px; box-sizing: border-box; flex-shrink: 0;
+}
+
+/* hover pencil that opens the contact editor */
+body.wa-skin #wa-sidebar .wa-row-edit {
+    position: absolute;
+    top: 8px; right: 10px;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--wa-icon); background: rgba(240, 242, 245, .95);
+    font-size: 12px; cursor: pointer; opacity: 0;
+    transition: opacity .12s ease, background-color .12s ease;
+    box-shadow: 0 1px 3px rgba(11, 20, 26, .2); z-index: 3;
+}
+body.wa-skin #wa-sidebar .wa-row:hover .wa-row-edit,
+body.wa-skin #wa-sidebar .wa-row:focus-within .wa-row-edit { opacity: 1; }
+body.wa-skin #wa-sidebar .wa-row-edit:hover { background: #fff; color: var(--wa-text); }
+
+/* footer strip */
+body.wa-skin #wa-sidebar .wa-promo {
+    flex-shrink: 0; border-top: 1px solid var(--wa-divider);
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    color: var(--wa-text-2); font-size: 13px;
+}
+body.wa-skin #wa-sidebar .wa-promo .wa-promo-logo {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--wa-green-badge);
+    display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; flex-shrink: 0;
+}
+
+/* =====================================================================
+   MAIN PANEL  (#sheld becomes the conversation pane)
+   ===================================================================== */
+body.wa-skin #sheld {
+    left: var(--wa-left) !important;
+    width: calc(100dvw - var(--wa-left)) !important;
+    top: 0 !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    background-color: var(--wa-chat-bg);
+    border-left: 1px solid var(--wa-divider-2);
+    overflow: hidden !important;
+}
+/* fixed wallpaper layer behind the scrolling chat */
+body.wa-skin #sheld::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("./doodle.svg");
+    background-repeat: repeat;
+    background-size: 412px 412px;
+    opacity: .40;
+    z-index: 0;
+    pointer-events: none;
+}
+body.wa-skin #sheldheader { display: none !important; }
+
+/* conversation header */
+body.wa-skin #wa-chat-header {
+    height: var(--wa-header-h);
+    flex-shrink: 0;
+    background: var(--wa-header-bg);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 14px;
+    z-index: 31;
+    position: relative;
+}
+body.wa-skin #wa-chat-header .wa-ch-avatar { width: 40px; height: 40px; cursor: pointer; }
+body.wa-skin #wa-chat-header .wa-ch-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; cursor: pointer; }
+body.wa-skin #wa-chat-header .wa-ch-name { font-size: 16px; color: var(--wa-text); font-weight: 500; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.wa-skin #wa-chat-header .wa-ch-status { font-size: 13px; color: var(--wa-text-2); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.wa-skin #wa-chat-header .wa-ch-actions { display: flex; align-items: center; gap: 2px; }
+body.wa-skin #wa-chat-header .wa-icon-btn:hover { background: var(--wa-hover-2); }
+body.wa-skin #wa-chat-header .wa-icon-btn.wa-video { gap: 2px; font-size: 18px; }
+body.wa-skin #wa-chat-header .wa-icon-btn.wa-video .fa-chevron-down { font-size: 11px; }
+
+/* =====================================================================
+   CHAT MESSAGE AREA
+   ===================================================================== */
+body.wa-skin #chat {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    max-height: none !important;
+    height: auto !important;
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    z-index: 1;
+    padding: 12px 6.5% 8px !important;
+    bottom: 0 !important;
+    scroll-behavior: auto;
+}
+
+/* hide per-message avatars and SillyTavern's name/timestamp row */
+body.wa-skin .mes .mesAvatarWrapper { display: none !important; }
+body.wa-skin .mes .ch_name .flex-container.flex1 { display: none !important; }
+body.wa-skin .mes .name_text,
+body.wa-skin .mes .timestamp,
+body.wa-skin .mes .mesIDDisplay,
+body.wa-skin .mes .mes_timer,
+body.wa-skin .mes .tokenCounterDisplay,
+body.wa-skin .mes .mes_ghost { display: none !important; }
+
+/* message row: aligns the bubble left (received) or right (sent) */
+body.wa-skin #chat .mes {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 0 2px 0 !important;
+    background: transparent !important;
+    border: none !important;
+    position: relative;
+}
+body.wa-skin #chat .mes[is_user="true"] { align-items: flex-end; }
+
+/* spacing between sender groups */
+body.wa-skin #chat .mes.wa-group-start { margin-top: 12px !important; }
+body.wa-skin #chat .mes:first-child { margin-top: 2px !important; }
+
+/* the bubble */
+body.wa-skin #chat .mes .mes_block {
+    position: relative;
+    max-width: 65%;
+    min-width: 92px;
+    width: auto !important;
+    background: var(--wa-bubble-in);
+    border-radius: var(--wa-radius);
+    padding: 6px 9px 8px 9px;
+    box-shadow: var(--wa-shadow);
+    margin: 0 !important;
+    color: var(--wa-text);
+}
+body.wa-skin #chat .mes[is_user="true"] .mes_block { background: var(--wa-bubble-out); }
+
+/* tail on the first bubble of a group */
+body.wa-skin #chat .mes.wa-group-start .mes_block { border-top-left-radius: 0; }
+body.wa-skin #chat .mes[is_user="true"].wa-group-start .mes_block { border-top-left-radius: var(--wa-radius); border-top-right-radius: 0; }
+body.wa-skin #chat .mes.wa-group-start .mes_block::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -8px;
+    width: 8px; height: 13px;
+    background: var(--wa-bubble-in);
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+body.wa-skin #chat .mes[is_user="true"].wa-group-start .mes_block::before {
+    left: auto; right: -8px;
+    background: var(--wa-bubble-out);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+/* group-chat sender name above the first bubble of a run */
+body.wa-skin #chat .mes .wa-sender {
+    font-size: 12.8px;
+    font-weight: 500;
+    line-height: 1.35;
+    margin-bottom: 2px;
+    padding-right: 46px;         /* clear of the hover action buttons */
+    overflow-wrap: anywhere;
+}
+
+/* message text */
+body.wa-skin #chat .mes .mes_text {
+    font-size: 14.2px;
+    line-height: 19px;
+    color: var(--wa-text);
+    padding: 0 !important;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
+body.wa-skin #chat .mes .mes_text p { margin: 0 0 6px 0; }
+body.wa-skin #chat .mes .mes_text p:last-child { margin-bottom: 0; }
+/* reserve room on the last line for the floated timestamp */
+body.wa-skin #chat .mes .mes_text::after {
+    content: "";
+    display: inline-block;
+    width: var(--wa-meta-w); height: 1px;
+}
+body.wa-skin #chat .mes[is_user="true"] .mes_text::after { width: var(--wa-meta-w-out); }
+body.wa-skin.wa-no-receipts #chat .mes[is_user="true"] .mes_text::after { width: var(--wa-meta-w); }
+
+body.wa-skin #chat .mes .mes_text em,
+body.wa-skin #chat .mes .mes_text i { color: #5e7461; }
+body.wa-skin #chat .mes .mes_text q { color: #1f7a5a; }
+
+/* injected timestamp and ticks, bottom-right inside the bubble */
+body.wa-skin .wa-meta {
+    position: absolute;
+    right: 9px;
+    bottom: 5px;
+    height: 15px;
+    display: flex; align-items: center; gap: 3px;
+    user-select: none;
+    pointer-events: none;
+}
+body.wa-skin .wa-meta .wa-time { font-size: 11px; color: var(--wa-meta); line-height: 15px; white-space: nowrap; }
+body.wa-skin .wa-meta .wa-ticks { display: inline-flex; align-items: center; color: var(--wa-tick-read); }
+body.wa-skin .wa-meta .wa-ticks svg { width: 16px; height: 11px; display: block; }
+body.wa-skin.wa-no-receipts .wa-meta .wa-ticks { display: none; }
+
+/* date separator and encryption notice pills */
+body.wa-skin .wa-date-sep,
+body.wa-skin .wa-encryption {
+    align-self: center;
+    margin: 12px auto;
+    z-index: 1;
+    text-align: center;
+}
+body.wa-skin .wa-date-sep span {
+    background: var(--wa-panel);
+    color: var(--wa-icon);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: var(--wa-radius);
+    box-shadow: var(--wa-shadow);
+    display: inline-block;
+}
+body.wa-skin .wa-encryption span {
+    background: #ffeecd;
+    color: var(--wa-icon);
+    font-size: 12.5px;
+    padding: 6px 12px;
+    border-radius: var(--wa-radius);
+    box-shadow: var(--wa-shadow);
+    display: inline-flex; align-items: center; gap: 6px;
+    max-width: 460px; text-align: center; line-height: 1.4;
+}
+body.wa-skin .wa-encryption .fa-lock { font-size: 10px; flex-shrink: 0; }
+
+/* keep media tidy inside bubbles */
+body.wa-skin #chat .mes .mes_img,
+body.wa-skin #chat .mes .mes_text img {
+    border-radius: 6px;
+    max-width: min(330px, 100%);
+}
+body.wa-skin #chat .mes .mes_block .mes_img_container { margin-bottom: 4px; }
+
+/* code blocks and tables must not blow the bubble open */
+body.wa-skin #chat .mes .mes_text pre,
+body.wa-skin #chat .mes .mes_text table { max-width: 100%; overflow-x: auto; }
+body.wa-skin #chat .mes .mes_text pre code { white-space: pre; }
+
+/* hover action buttons fade in at the bubble's top-right corner */
+body.wa-skin #chat .mes .ch_name {
+    position: absolute; top: 0; right: 0; padding: 0 !important; margin: 0 !important;
+    min-height: 0 !important; background: transparent !important; pointer-events: none;
+    width: 100%; justify-content: flex-end;
+}
+body.wa-skin #chat .mes .mes_buttons {
+    pointer-events: auto;
+    opacity: 0;
+    transition: opacity .12s ease;
+    background: linear-gradient(90deg, transparent, var(--wa-bubble-in) 40%);
+    border-radius: 0 var(--wa-radius) var(--wa-radius) 0;
+    padding-left: 18px;
+}
+body.wa-skin #chat .mes[is_user="true"] .mes_buttons {
+    background: linear-gradient(90deg, transparent, var(--wa-bubble-out) 40%);
+}
+body.wa-skin #chat .mes .mes_block:hover .mes_buttons,
+body.wa-skin #chat .mes .mes_block:focus-within .mes_buttons { opacity: 1; }
+
+/* The in-chat edit toolbar also lives inside .ch_name (pointer-events:none),
+   so re-enable it and stack it above the edit textarea. */
+body.wa-skin #chat .mes .mes_edit_buttons {
+    pointer-events: auto;
+    position: relative;
+    z-index: 6;
+}
+body.wa-skin #chat .mes .mes_edit_buttons .menu_button { pointer-events: auto; }
+
+/* swipe arrows: only on the last message, faint until hover */
+body.wa-skin #chat .mes .swipe_left,
+body.wa-skin #chat .mes .swipeRightBlock { display: none !important; }
+body.wa-skin #chat .last_mes .swipe_left,
+body.wa-skin #chat .last_mes .swipeRightBlock { display: flex !important; opacity: 0; }
+body.wa-skin #chat .last_mes:hover .swipe_left,
+body.wa-skin #chat .last_mes:hover .swipeRightBlock { opacity: .35; }
+body.wa-skin #chat .swipes-counter { color: var(--wa-text-2) !important; }
+
+/* edit textarea inside a bubble */
+body.wa-skin #chat .mes .edit_textarea {
+    background: rgba(255, 255, 255, .6); color: var(--wa-text); border-radius: 6px;
+    font-family: var(--wa-font); font-size: 14.2px;
+    width: 100%;
+    box-sizing: border-box;
+}
+/* A short message makes a narrow bubble, which clips the edit toolbar.
+   While editing, give the bubble a floor width that fits every button. */
+body.wa-skin #chat .mes .mes_block:has(.edit_textarea) {
+    max-width: 90%;
+    min-width: min(360px, 90%);
+    padding-top: 40px;
+}
+
+/* =====================================================================
+   COMPOSER  (#form_sheld restyled into the messenger input bar)
+   ===================================================================== */
+body.wa-skin #form_sheld {
+    background: var(--wa-header-bg) !important;
+    margin: 0 !important;
+    padding: 8px 16px !important;
+    z-index: 31;
+    position: relative;
+    flex-shrink: 0;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+body.wa-skin #send_form {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px;
+    /* MUST stay `wrap` (SillyTavern's own default). Extensions append
+       full-width rows here as siblings of #nonQRFormItems (button bars, the
+       QR bar, #file_form) and rely on wrapping to get their own line. With
+       nowrap they share the composer's row and crush the text field. */
+    flex-wrap: wrap !important;
+    width: 100%;
+}
+body.wa-skin #nonQRFormItems {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px;
+    width: 100%;
+    flex-wrap: nowrap !important;
+}
+
+/* left icons */
+body.wa-skin #leftSendForm {
+    display: flex !important; align-items: center; gap: 4px;
+    order: 0; flex: 0 0 auto; background: transparent !important; border: none !important;
+}
+/* Swap SillyTavern's own glyphs for messenger ones purely in CSS, so the
+   icons stay correct however often ST re-renders those buttons.
+   \2b = plus (attach), \f249 = sticky note (stickers). */
+body.wa-skin #options_button::before { content: "\2b"; }
+body.wa-skin #extensionsMenuButton::before { content: "\f249"; }
+body.wa-skin #leftSendForm #options_button,
+body.wa-skin #leftSendForm #extensionsMenuButton {
+    color: var(--wa-icon) !important; font-size: 23px !important;
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; margin: 0 !important;
+}
+body.wa-skin #leftSendForm #options_button:hover,
+body.wa-skin #leftSendForm #extensionsMenuButton:hover { background: var(--wa-hover-2); }
+body.wa-skin .wa-compose-ico {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--wa-icon); font-size: 23px; cursor: pointer; transition: background-color .12s ease;
+}
+body.wa-skin .wa-compose-ico:hover { background: var(--wa-hover-2); }
+
+/* the text field becomes a white rounded pill */
+body.wa-skin #send_textarea {
+    order: 1; flex: 1 1 auto;
+    background: var(--wa-panel) !important;
+    border-radius: 8px !important;
+    border: none !important;
+    padding: 9px 12px !important;
+    margin: 0 !important;
+    font-size: 15px !important;
+    line-height: 20px !important;
+    color: var(--wa-text) !important;
+    min-height: 42px;
+    max-height: 100px;
+    box-shadow: none !important;
+    font-family: var(--wa-font) !important;
+}
+body.wa-skin #send_textarea::placeholder { color: var(--wa-text-2) !important; opacity: 1; }
+
+/* right side: send button plus the injected mic */
+body.wa-skin #rightSendForm {
+    order: 2; flex: 0 0 auto;
+    display: flex !important; align-items: center; gap: 4px;
+    background: transparent !important; border: none !important;
+}
+body.wa-skin #rightSendForm .wa-compose-ico.wa-mic { font-size: 22px; }
+body.wa-skin #send_but,
+body.wa-skin #mes_continue,
+body.wa-skin #mes_impersonate {
+    color: var(--wa-icon) !important;
+    font-size: 22px !important;
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
+body.wa-skin #send_but { color: var(--wa-green-deep) !important; }
+body.wa-skin #send_but:hover,
+body.wa-skin #mes_continue:hover,
+body.wa-skin #mes_impersonate:hover { background: var(--wa-hover-2); }
+body.wa-skin #mes_stop {
+    color: var(--wa-icon) !important; font-size: 22px !important;
+    width: 40px; height: 40px; border-radius: 50%;
+    align-items: center; justify-content: center;
+    display: none !important;
+}
+/* the stop button only appears while a reply is generating */
+body.wa-skin.wa-generating #mes_stop { display: flex !important; }
+
+/* hide script-control buttons in the composer for cleanliness */
+body.wa-skin #rightSendForm .stscript_btn { display: none !important; }
+
+/* the mic gives way to the send button once there is text */
+body.wa-skin #form_sheld.wa-has-text .wa-mic { display: none !important; }
+body.wa-skin #form_sheld:not(.wa-has-text) .wa-mic { display: flex !important; }
+
+/* =====================================================================
+   SCROLLBARS
+   ===================================================================== */
+body.wa-skin #chat::-webkit-scrollbar,
+body.wa-skin .wa-list::-webkit-scrollbar { width: 6px; }
+body.wa-skin #chat::-webkit-scrollbar-thumb,
+body.wa-skin .wa-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, .2); border-radius: 3px;
+}
+body.wa-skin #chat::-webkit-scrollbar-track,
+body.wa-skin .wa-list::-webkit-scrollbar-track { background: transparent; }
+
+/* =====================================================================
+   MISC: things that would break the illusion
+   ===================================================================== */
+body.wa-skin #rm_print_characters_block,
+body.wa-skin .zoomed_avatar { z-index: 5000; }
+body.wa-skin #expression-wrapper,
+body.wa-skin #expression-holder { display: none !important; }
+body.wa-skin #send_form.no-connection { opacity: 1 !important; }
+body.wa-skin .typing_indicator { color: var(--wa-text-2); }
+body.wa-skin #left-nav-panel,
+body.wa-skin #right-nav-panel { z-index: 4001; }
+
+/* =====================================================================
+   CONTACT EDITOR MODAL
+   ===================================================================== */
+body.wa-skin .wa-modal-overlay {
+    /* viewport units rather than inset:0 — SillyTavern puts a transform on
+       <html>, which would collapse a position:fixed inset:0 box. */
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; z-index: 6000;
+    background: rgba(11, 20, 26, .55);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px; box-sizing: border-box;
+    font-family: var(--wa-font);
+}
+body.wa-skin .wa-modal {
+    width: 420px; max-width: 92vw; max-height: 92dvh;
+    background: var(--wa-panel); border-radius: 6px; overflow: hidden;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, .35);
+    color: var(--wa-text);
+    display: flex; flex-direction: column;
+}
+body.wa-skin .wa-modal-head {
+    background: var(--wa-green-deep); color: #fff; flex-shrink: 0;
+    padding: 22px 24px 18px; font-size: 19px; font-weight: 500;
+}
+body.wa-skin .wa-modal-body { padding: 22px 24px 6px; overflow-y: auto; }
+body.wa-skin .wa-modal-photo-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 14px; }
+body.wa-skin .wa-modal-photo { width: 120px; height: 120px; cursor: pointer; position: relative; }
+body.wa-skin .wa-modal-photo .wa-photo-cam {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, .4); color: #fff; font-size: 26px; opacity: 0; transition: opacity .12s ease;
+}
+body.wa-skin .wa-modal-photo:hover .wa-photo-cam { opacity: 1; }
+body.wa-skin .wa-photo-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+body.wa-skin .wa-modal-field { margin: 14px 0; }
+body.wa-skin .wa-modal-field label { display: block; font-size: 12.5px; color: var(--wa-green-deep); margin-bottom: 4px; }
+body.wa-skin .wa-modal-field input[type="text"] {
+    width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid var(--wa-divider-2);
+    padding: 6px 2px; font-size: 15px; outline: none; color: var(--wa-text); background: transparent;
+    font-family: inherit;
+}
+body.wa-skin .wa-modal-field input[type="text"]:focus { border-bottom: 2px solid var(--wa-green); }
+body.wa-skin .wa-modal-check { display: flex; align-items: center; gap: 8px; margin: 14px 0 4px; font-size: 14px; cursor: pointer; }
+body.wa-skin .wa-modal-note { font-size: 12.5px; color: var(--wa-text-2); margin: 12px 0 4px; line-height: 1.45; }
+body.wa-skin .wa-modal-foot { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 12px 22px 20px; flex-shrink: 0; }
+body.wa-skin .wa-btn {
+    border: none; background: none; cursor: pointer;
+    font-size: 14px; font-weight: 500; padding: 9px 18px; border-radius: 20px;
+    font-family: inherit; transition: background-color .12s ease;
+}
+body.wa-skin .wa-btn.primary { background: var(--wa-green); color: #fff; }
+body.wa-skin .wa-btn.primary:hover { background: #019d7c; }
+body.wa-skin .wa-btn.ghost { color: var(--wa-green-deep); }
+body.wa-skin .wa-btn.ghost:hover { background: var(--wa-header-bg); }
+body.wa-skin .wa-btn.wa-del { color: #e3493b; margin-right: auto; }
+body.wa-skin .wa-btn.wa-del:hover { background: #fdecea; }
+
+/* =====================================================================
+   REASONING BLOCK ("Thought for X seconds") → light theme
+   SillyTavern paints the summary pill with var(--grey30) and light body
+   text, which clashes with the white bubble it sits in.
+   ===================================================================== */
+body.wa-skin #chat .mes .mes_reasoning_details { color: #3b4a54; }
+body.wa-skin #chat .mes .mes_reasoning_header {
+    background-color: var(--wa-divider);
+    color: #3b4a54;
+}
+body.wa-skin #chat .mes .mes_reasoning_header:hover { background-color: #e1e6e9; }
+body.wa-skin #chat .mes .mes_reasoning_header_title { color: #3b4a54; }
+body.wa-skin #chat .mes .mes_reasoning_arrow { color: var(--wa-text-2); }
+body.wa-skin #chat .mes .mes_reasoning {
+    border-left-color: #c7ced2;
+    color: #3b4a54;
+}
+body.wa-skin #chat .mes .mes_reasoning_actions .mes_button,
+body.wa-skin #chat .mes .mes_reasoning_actions .edit_button { color: var(--wa-icon); }
+
+/* =====================================================================
+   SETTINGS PANEL (Extensions tab)
+   ===================================================================== */
+#wa-settings-block .wa-opt { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+#wa-settings-block .wa-opt-text { margin: 8px 0; }
+#wa-settings-block .wa-opt-text small { display: block; margin-bottom: 3px; }
+#wa-settings-block .wa-hint { display: block; margin: 10px 0 4px; opacity: .7; line-height: 1.45; }
+#wa-settings-block .wa-reset-btn { display: inline-block; margin-top: 4px; }
+
+/* =====================================================================
+   SILLYTAVERN'S MENUS, NAV BAR, CHARACTER LIST AND POPUPS
+   ST paints its panels from the --SmartTheme* variables, applied inline on
+   <html>. Re-declaring them on the menu containers (all descendants of
+   <body>) re-themes every drawer, the nav bar, the character list and the
+   popups to light — without touching #chat, which the skin styles directly
+   and which is not a descendant of these containers.
+   ===================================================================== */
+body.wa-skin #top-bar,
+body.wa-skin #top-settings-holder,
+body.wa-skin .drawer-content,
+body.wa-skin #floatingPrompt,
+body.wa-skin #cfgConfig,
+body.wa-skin #logprobsViewer,
+body.wa-skin #options,
+body.wa-skin .options-content,
+body.wa-skin #character_popup,
+body.wa-skin .popup,
+body.wa-skin dialog.popup {
+    --SmartThemeBlurTintColor: #ffffff;
+    --SmartThemeChatTintColor: #ffffff;
+    --SmartThemeBodyColor: #111b21;
+    --SmartThemeBorderColor: rgba(11, 20, 26, .12);
+    --SmartThemeShadowColor: rgba(11, 20, 26, .12);
+    --SmartThemeEmColor: #3b4a54;
+    --SmartThemeQuoteColor: #008069;
+    --SmartThemeUnderlineColor: #008069;
+    --SmartThemeUserMesBlurTintColor: #d9fdd3;
+    --SmartThemeBotMesBlurTintColor: #ffffff;
+    --SmartThemeFastUIBGColor: #ffffff;
+    --black30a: rgba(11, 20, 26, .06);
+    --white30a: rgba(11, 20, 26, .06);
+    color: var(--SmartThemeBodyColor);
+}
+
+/* nav-bar icons and panel headers must read on the light bar */
+body.wa-skin #top-bar,
+body.wa-skin #top-settings-holder { background-color: #f0f2f5 !important; }
+body.wa-skin #top-settings-holder .drawer-toggle .drawer-icon { color: #54656f; }
+body.wa-skin #top-settings-holder .drawer-toggle .drawer-icon.openIcon { color: #008069; }
+
+/* solid light panels (kill the dark blur tint bleeding through) */
+body.wa-skin .drawer-content,
+body.wa-skin #character_popup,
+body.wa-skin .popup { background-color: #ffffff !important; }
+
+/* inputs and fields inside the menus */
+body.wa-skin #top-settings-holder .text_pole,
+body.wa-skin #top-settings-holder select,
+body.wa-skin #top-settings-holder textarea,
+body.wa-skin .popup .text_pole,
+body.wa-skin .popup select,
+body.wa-skin .popup textarea {
+    background-color: #ffffff;
+    color: #111b21;
+    border: 1px solid #d1d7db;
+}
+
+/* row hovers in the character list and menus (white30a is invisible on white) */
+body.wa-skin #top-settings-holder .menu_button:hover,
+body.wa-skin #top-settings-holder .character_select:hover,
+body.wa-skin #top-settings-holder .group_select:hover,
+body.wa-skin #top-settings-holder .avatar-container:hover { background-color: #f0f2f5; }
+
+/* ---------------------------------------------------------------------
+   Prompt Manager (AI Response Configuration → Prompts)
+   ST paints parts of this list with the --white*a alpha vars, which only
+   read on a dark panel: --white50a/--white20a stay pure white (invisible on
+   the white drawer) and --white30a is remapped above to a 6%-alpha dark
+   that works as a hover tint but not as text. Presets with many toggled-off
+   entries would otherwise be almost entirely invisible.
+   --------------------------------------------------------------------- */
+body.wa-skin #completion_prompt_manager .completion_prompt_manager_header { color: #54656f; }
+
+/* role icons and disabled prompts: #667781 is clearly muted against the
+   enabled #111b21, yet still 4.6:1 on white, so it passes WCAG AA. */
+body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt .completion_prompt_manager_prompt_name .fa-solid,
+body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt_disabled .completion_prompt_manager_prompt_name,
+body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt_disabled .completion_prompt_manager_prompt_name .prompt-manager-inspect-action { color: #667781; }
+
+/* ...and the row outline --white20a leaves invisible */
+body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt.completion_prompt_manager_prompt_disabled { border-color: #e9edef; }
+
+/* the row and header control icons carry a black glow meant for a dark panel */
+body.wa-skin #completion_prompt_manager #completion_prompt_manager_list li.completion_prompt_manager_prompt span span span,
+body.wa-skin #completion_prompt_manager .completion_prompt_manager_header_advanced span { filter: none; }
+
+/* at 0.4 opacity the dark icons wash out on white — lift the resting state */
+body.wa-skin #completion_prompt_manager #completion_prompt_manager_list li.completion_prompt_manager_prompt span span span { opacity: 0.65; }
+
+/* =====================================================================
+   OPTIONAL COMPANIONS
+   Light-theme touch-ups for popular extensions, applied only if they are
+   installed. Harmless otherwise.
+   ===================================================================== */
+
+/* ---- Choices (story-beat suggestion buttons) ---- */
+body.wa-skin #chat .mes .mes_block:has(.st-choices-container) {
+    /* Keep the 65% bubble limit from the base rule so a message with
+       suggestions never grows wider than a regular one; only add a gentle
+       min-width floor for very short messages. */
+    min-width: min(300px, 65%);
+}
+body.wa-skin #chat .st-choices-container {
+    background: var(--wa-header-bg);
+    border: 1px solid var(--wa-hover-2);
+}
+body.wa-skin #chat .st-choices-btn {
+    background: var(--wa-panel);
+    border: 1px solid var(--wa-divider-2);
+    color: var(--wa-text);
+}
+body.wa-skin #chat .st-choices-btn:hover {
+    background: var(--wa-hover);
+    border-color: #c3cbd0;
+    box-shadow: 0 1px 3px rgba(11, 20, 26, .12);
+}
+body.wa-skin #chat .st-choices-copy {
+    background: var(--wa-panel);
+    border: 1px solid var(--wa-divider-2);
+    color: var(--wa-icon);
+}
+body.wa-skin #chat .st-choices-copy:hover {
+    background: var(--wa-hover);
+    border-color: #c3cbd0;
+    box-shadow: 0 1px 3px rgba(11, 20, 26, .12);
+}
+body.wa-skin #chat .st-choices-copy.st-choices-copied { color: var(--wa-green-deep); }
+body.wa-skin #chat .st-choices-regen {
+    background: transparent;
+    border: none;
+    color: var(--wa-green-deep);
+}
+body.wa-skin #chat .st-choices-regen:hover { color: #006a56; opacity: 1; }
+
+/* ---- Guided Generations ----
+   GG injects #gg-action-button-container into #send_form right after
+   #nonQRFormItems. ST gives #nonQRFormItems order:25 while GG's container
+   keeps order:0, so without an explicit order the button bar renders to the
+   LEFT of the composer. Push it past the composer, pin it to a row of its
+   own, then repaint the bordered dark buttons as flat icon buttons. */
+body.wa-skin #gg-action-button-container {
+    order: 30;              /* after #nonQRFormItems (order: 25) */
+    flex: 0 0 100%;         /* own row, below the composer */
+    width: 100%;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 0 0;
+    margin: 0;
+}
+body.wa-skin #gg-action-button-container .gg-action-button,
+body.wa-skin #gg-action-button-container .gg-menu-button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 17px;
+    color: var(--wa-icon) !important;
+    font-size: 17px;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color .12s ease;
+}
+body.wa-skin #gg-action-button-container .gg-action-button:hover,
+body.wa-skin #gg-action-button-container .gg-menu-button:hover {
+    background: var(--wa-hover-2) !important;
+    color: var(--wa-text) !important;
+}
+body.wa-skin #gg-action-button-container .pg-guide-counter {
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 4px;
+    color: inherit;
+}
+body.wa-skin #pg_counter_badge { background-color: var(--wa-green); }
+
+/* the QR spacer keeps the action buttons pinned right */
+body.wa-skin #gg-qr-container { margin: 0 6px; }
+body.wa-skin #gg-qr-container #qr--bar {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+body.wa-skin #send_form .qr--button {
+    background: var(--wa-panel);
+    border: 1px solid var(--wa-divider-2);
+    color: var(--wa-text);
+    border-radius: 14px;
+}
+body.wa-skin #send_form .qr--button:hover { background: var(--wa-hover); border-color: #c3cbd0; }
+
+/* GG's dropdowns are appended to <body>, so they miss the menu var overrides
+   above; give them the same light palette plus a solid white surface. */
+body.wa-skin #gg_tools_menu,
+body.wa-skin #pg_tools_menu,
+body.wa-skin .gg-tools-menu,
+body.wa-skin #persistent-guides-menu,
+body.wa-skin .gg-popup-content,
+body.wa-skin .gg-group-picker-dialog {
+    --SmartThemeBlurTintColor: #ffffff;
+    --SmartThemeChatTintColor: #ffffff;
+    --SmartThemeBg: #ffffff;
+    --SmartThemeBodyColor: #111b21;
+    --SmartThemeBorderColor: rgba(11, 20, 26, .12);
+    --SmartThemeShadowColor: rgba(11, 20, 26, .12);
+    --SmartThemeHover: #f0f2f5;
+    --SmartThemeUi: #111b21;
+    --SmartThemeAccentColor: #008069;
+    --SmartThemeQuoteColor: #008069;
+    --SmartThemeUserMesBlurTintColor: #d9fdd3;
+    --SmartThemeBotMesBlurTintColor: #ffffff;
+    --black30a: rgba(11, 20, 26, .06);
+    --white30a: rgba(11, 20, 26, .06);
+    background-color: #ffffff !important;
+    color: #111b21;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: 0 2px 10px rgba(11, 20, 26, .16);
+    border: 1px solid #e9edef;
+    font-family: var(--wa-font);
+}
+body.wa-skin .gg-tools-menu > .interactable:hover,
+body.wa-skin .gg-tools-menu .list-group-item:hover,
+body.wa-skin .persistent-guide-item:hover,
+body.wa-skin .persistent-guides-header:hover {
+    background-color: #f0f2f5;
+    color: #111b21;
+}
+
+/* =====================================================================
+   RESPONSIVE
+   The three-pane layout needs room. Narrow the list first, then drop the
+   rail and sidebar entirely and let the conversation fill the screen.
+   ===================================================================== */
+@media (max-width: 1100px) {
+    body.wa-skin { --wa-list-w: clamp(260px, 32vw, 340px); }
+    body.wa-skin #chat { padding-left: 4% !important; padding-right: 4% !important; }
+    body.wa-skin #chat .mes .mes_block { max-width: 78%; }
+}
+
+@media (max-width: 860px) {
+    body.wa-skin { --wa-left: 0px; }
+    body.wa-skin #wa-rail,
+    body.wa-skin #wa-sidebar { display: none; }
+    body.wa-skin #sheld { border-left: none; }
+    body.wa-skin #chat { padding: 8px 3% 6px !important; }
+    body.wa-skin #chat .mes .mes_block { max-width: 86%; }
+    body.wa-skin #wa-chat-header { padding: 0 8px; gap: 10px; }
+    body.wa-skin #form_sheld { padding: 6px 8px !important; }
+    body.wa-skin .wa-encryption span { max-width: 90%; }
+}
+
+/* Very small screens: every icon costs the text field ~40px, so trim the
+   composer to what actually does something. The emoji button is decorative
+   (it only focuses the field, which tapping it already does), so it goes. */
+@media (max-width: 520px) {
+    body.wa-skin #wa-chat-header .wa-icon-btn.wa-video { display: none; }
+    body.wa-skin #leftSendForm .wa-emoji { display: none; }
+    body.wa-skin .wa-compose-ico { width: 34px; height: 34px; font-size: 20px; }
+    body.wa-skin #leftSendForm #options_button,
+    body.wa-skin #leftSendForm #extensionsMenuButton,
+    body.wa-skin #send_but,
+    body.wa-skin #mes_stop { width: 34px; height: 34px; font-size: 20px !important; }
+    body.wa-skin #send_textarea { padding: 8px 10px !important; min-height: 38px; }
+    body.wa-skin #chat .mes .mes_block { max-width: 92%; }
+}
+
+/* respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    body.wa-skin *,
+    body.wa-skin *::before,
+    body.wa-skin *::after { transition-duration: .001ms !important; }
+}

@@ -1,0 +1,13 @@
+{
+    "display_name": "SillyZap — WhatsApp Web Skin",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "matheusgdqueiroz-del",
+    "version": "1.0.0",
+    "homePage": "https://github.com/matheusgdqueiroz-del/SillyZap",
+    "minimum_client_version": "1.12.0",
+    "auto_update": true
+}
