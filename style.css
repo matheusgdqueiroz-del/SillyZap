@@ -1,47 +1,100 @@
 /* =====================================================================
    SillyZap — a WhatsApp Web-style skin for SillyTavern
    ---------------------------------------------------------------------
-   Light-theme replica. Every rule is scoped under `body.wa-skin`, including
-   the chrome index.js injects (#wa-rail / #wa-sidebar / #wa-chat-header),
-   so disabling the skin restores SillyTavern untouched.
+   Every rule is scoped under `body.wa-skin`, including the chrome index.js
+   injects (#wa-rail / #wa-sidebar / #wa-chat-header), so disabling the skin
+   restores SillyTavern untouched.
+
+   Colours come exclusively from the --wa-* custom properties declared in the
+   two palette blocks below. Adding `wa-dark` to <body> swaps the palette;
+   nothing else in this file needs to know which theme is active, so if you
+   are restyling something, reach for a variable rather than a literal.
 
    https://github.com/matheusgdqueiroz-del/SillyZap
    ===================================================================== */
 
+/* =====================================================================
+   PALETTE — LIGHT (default)
+   ===================================================================== */
 body.wa-skin {
-    /* ---- palette ---- */
     --wa-font: "Segoe UI", "Helvetica Neue", Helvetica, system-ui, -apple-system, Roboto, Arial, sans-serif;
 
-    --wa-panel: #ffffff;            /* sidebar / list background           */
+    /* surfaces */
+    --wa-panel: #ffffff;            /* sidebar / chat list                 */
+    --wa-panel-2: #ffffff;          /* popups, modals, dropdowns           */
     --wa-header-bg: #f0f2f5;        /* panel headers, search, input bar    */
     --wa-rail-bg: #f7f8fa;          /* far-left icon rail                  */
     --wa-app-bg: #d9dbd4;           /* behind everything                   */
     --wa-chat-bg: #efeae2;          /* conversation wallpaper base         */
+    --wa-input-bg: #ffffff;         /* composer pill                       */
 
-    --wa-text: #111b21;             /* primary text                        */
+    /* text */
+    --wa-text: #111b21;
     --wa-text-2: #667781;           /* secondary / preview / meta          */
-    --wa-text-3: #8696a0;           /* tertiary / faint                    */
+    --wa-text-3: #8696a0;
     --wa-icon: #54656f;             /* icon buttons                        */
-    --wa-divider: #e9edef;          /* hairline dividers                   */
+    --wa-chip-fg: #3b4a54;
+
+    /* lines */
+    --wa-divider: #e9edef;
     --wa-divider-2: #d1d7db;
+    --wa-border-a: rgba(11, 20, 26, .12);
+    --wa-tint-a: rgba(11, 20, 26, .06);
 
-    --wa-bubble-in: #ffffff;        /* received bubble                     */
-    --wa-bubble-out: #d9fdd3;       /* sent bubble                         */
-    --wa-meta: #667781;             /* timestamp text                      */
+    /* bubbles */
+    --wa-bubble-in: #ffffff;
+    --wa-bubble-out: #d9fdd3;
+    --wa-meta: #667781;             /* timestamp on a received bubble      */
+    --wa-meta-out: #667781;         /* timestamp on a sent bubble          */
+    --wa-em: #5e7461;               /* italics inside a bubble             */
+    --wa-quote: #1f7a5a;
+    --wa-edit-bg: rgba(255, 255, 255, .6);
 
-    --wa-green: #00a884;            /* primary accent                      */
-    --wa-green-deep: #008069;       /* darker accent / active filter text  */
-    --wa-green-badge: #25d366;      /* unread count badge                  */
-    --wa-tick-read: #53bdeb;        /* read tick                           */
+    /* accents */
+    --wa-green: #00a884;
+    --wa-green-deep: #008069;
+    --wa-green-badge: #25d366;
+    --wa-on-green: #ffffff;         /* text sitting on a green fill        */
+    --wa-tick-read: #53bdeb;
+    --wa-danger: #e3493b;
+    --wa-danger-bg: #fdecea;
 
+    /* states */
     --wa-hover: #f5f6f6;            /* list row hover                      */
     --wa-hover-2: #e1e4e6;          /* icon button hover on grey surfaces  */
     --wa-active: #f0f2f5;           /* selected list row                   */
-    --wa-chip: #f0f2f5;             /* inactive filter chip                */
-    --wa-chip-active-bg: #d9fdd3;   /* active filter chip                  */
+    --wa-chip: #f0f2f5;
+    --wa-chip-active-bg: #d9fdd3;
+    --wa-chip-active-fg: #008069;
+    --wa-pencil-bg: rgba(240, 242, 245, .95);
+    --wa-scroll: rgba(0, 0, 0, .2);
+
+    /* in-chat pills */
+    --wa-sep-bg: #ffffff;           /* date separator                      */
+    --wa-sep-fg: #54656f;
+    --wa-notice-bg: #ffeecd;        /* encryption notice                   */
+    --wa-notice-fg: #54656f;
+
+    /* modal */
+    --wa-modal-head-bg: #008069;
+    --wa-modal-head-fg: #ffffff;
+
+    /* SillyTavern section headers (see the MENUS section) */
+    --wa-sect-bg: #d9fdd3;
+    --wa-sect-fg: #005c4b;
+    --wa-sect-hover: #cdf5c6;
+
+    /* avatars */
+    --wa-av-bg: #dfe5e7;
+    --wa-av-fg: #ffffff;
+
+    /* wallpaper */
+    --wa-doodle-opacity: .40;
+    --wa-doodle-filter: none;
 
     --wa-shadow: 0 1px 0.5px rgba(11, 20, 26, .13);
 
+    /* metrics */
     --wa-rail-w: 64px;
     --wa-list-w: clamp(300px, 30vw, 460px);
     --wa-left: calc(var(--wa-rail-w) + var(--wa-list-w));
@@ -55,6 +108,80 @@ body.wa-skin {
 
     font-family: var(--wa-font);
     background-color: var(--wa-app-bg) !important;
+}
+
+/* =====================================================================
+   PALETTE — DARK
+   index.js adds `wa-dark` for the Dark theme, or for System when the OS
+   reports a dark preference. Only the values change; every rule below is
+   written once against the variables.
+   ===================================================================== */
+body.wa-skin.wa-dark {
+    --wa-panel: #111b21;
+    --wa-panel-2: #233138;
+    --wa-header-bg: #202c33;
+    --wa-rail-bg: #202c33;
+    --wa-app-bg: #0b141a;
+    --wa-chat-bg: #0b141a;
+    --wa-input-bg: #2a3942;
+
+    --wa-text: #e9edef;
+    --wa-text-2: #8696a0;
+    --wa-text-3: #667781;
+    --wa-icon: #aebac1;
+    --wa-chip-fg: #8696a0;
+
+    --wa-divider: #222d34;
+    --wa-divider-2: #2a3942;
+    --wa-border-a: rgba(233, 237, 239, .14);
+    --wa-tint-a: rgba(233, 237, 239, .08);
+
+    --wa-bubble-in: #202c33;
+    --wa-bubble-out: #005c4b;
+    --wa-meta: #8696a0;
+    --wa-meta-out: rgba(233, 237, 239, .6);
+    --wa-em: #a3c3a6;
+    --wa-quote: #7ad1ac;
+    --wa-edit-bg: rgba(0, 0, 0, .25);
+
+    --wa-green: #00a884;
+    --wa-green-deep: #00a884;
+    --wa-green-badge: #00a884;
+    --wa-on-green: #111b21;
+    --wa-tick-read: #53bdeb;
+    --wa-danger: #f15c6d;
+    --wa-danger-bg: rgba(241, 92, 109, .12);
+
+    --wa-hover: #202c33;
+    --wa-hover-2: #2a3942;
+    --wa-active: #2a3942;
+    --wa-chip: #202c33;
+    --wa-chip-active-bg: #103529;
+    --wa-chip-active-fg: #00a884;
+    --wa-pencil-bg: rgba(32, 44, 51, .95);
+    --wa-scroll: rgba(255, 255, 255, .18);
+
+    --wa-sep-bg: #182229;
+    --wa-sep-fg: #8696a0;
+    --wa-notice-bg: #182229;
+    --wa-notice-fg: #ffd279;
+
+    --wa-modal-head-bg: #202c33;
+    --wa-modal-head-fg: #e9edef;
+
+    --wa-sect-bg: #103529;
+    --wa-sect-fg: #8fe3bd;
+    --wa-sect-hover: #14432f;
+
+    --wa-av-bg: #6a7175;
+    --wa-av-fg: #cfd4d6;
+
+    --wa-doodle-opacity: .06;
+    --wa-doodle-filter: invert(1);
+
+    --wa-shadow: 0 1px 0.5px rgba(11, 20, 26, .4);
+
+    color-scheme: dark;
 }
 
 /* Kill the themed background image and blur underneath */
@@ -76,6 +203,22 @@ body.wa-skin #send_textarea {
 }
 
 body.wa-skin .wa-hidden { display: none !important; }
+
+/* ---------------------------------------------------------------------
+   Theme-swap guard.
+   If an element's background-color comes from a custom property AND is
+   covered by a non-zero `transition`, Chromium keeps the stale colour when
+   that property changes — the element simply never repaints. That hits our
+   own controls and SillyTavern's section headers (`transition: all`) alike.
+   index.js pins this class on <body> for two frames around the palette
+   swap so every colour is committed with transitions switched off.
+   --------------------------------------------------------------------- */
+body.wa-theme-switching,
+body.wa-theme-switching *,
+body.wa-theme-switching *::before,
+body.wa-theme-switching *::after {
+    transition: none !important;
+}
 
 /* =====================================================================
    SILLYTAVERN'S OWN TOP BAR
@@ -110,7 +253,7 @@ body.wa-skin .wa-modal-photo {
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
-    background: #dfe5e7;
+    background: var(--wa-av-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -130,7 +273,10 @@ body.wa-skin .wa-av-fallback {
 }
 body.wa-skin .wa-av-default { padding: 0; background: transparent; }
 body.wa-skin .wa-av-default svg { display: block; width: 100%; height: 100%; }
-body.wa-skin .wa-av-group { background: #cfd6da; }
+/* the silhouette is inline SVG, so its fills can follow the palette */
+body.wa-skin .wa-av-default svg rect { fill: var(--wa-av-bg); }
+body.wa-skin .wa-av-default svg g { fill: var(--wa-av-fg); }
+body.wa-skin .wa-av-group { background: var(--wa-av-bg); color: var(--wa-av-fg); }
 body.wa-skin .wa-av-group i { font-size: 0.85em; }
 
 /* Each avatar wrapper sets its own font-size so the 0.42em above resolves. */
@@ -178,11 +324,11 @@ body.wa-skin #wa-rail .wa-rail-btn {
     position: relative;
     transition: background-color .12s ease;
 }
-body.wa-skin #wa-rail .wa-rail-btn:hover { background: var(--wa-divider); }
+body.wa-skin #wa-rail .wa-rail-btn:hover { background: var(--wa-hover-2); }
 body.wa-skin #wa-rail .wa-rail-btn.active { color: var(--wa-green-deep); }
 body.wa-skin #wa-rail .wa-rail-badge {
     position: absolute; top: 2px; right: 2px;
-    background: var(--wa-green-badge); color: #fff;
+    background: var(--wa-green-badge); color: var(--wa-on-green);
     min-width: 17px; height: 17px; border-radius: 9px;
     font-size: 10px; font-weight: 600; line-height: 17px; text-align: center;
     padding: 0 4px; box-sizing: border-box;
@@ -225,7 +371,7 @@ body.wa-skin #wa-sidebar .wa-sb-header {
     gap: 8px;
 }
 body.wa-skin #wa-sidebar .wa-sb-title {
-    font-size: 21px; font-weight: 700; color: #1d1f1f; letter-spacing: .2px;
+    font-size: 21px; font-weight: 700; color: var(--wa-text); letter-spacing: .2px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 body.wa-skin #wa-sidebar .wa-sb-actions { display: flex; align-items: center; gap: 2px; }
@@ -257,11 +403,11 @@ body.wa-skin #wa-sidebar .wa-filters {
 }
 body.wa-skin #wa-sidebar .wa-filters::-webkit-scrollbar { display: none; }
 body.wa-skin #wa-sidebar .wa-chip {
-    background: var(--wa-chip); color: #3b4a54;
+    background: var(--wa-chip); color: var(--wa-chip-fg);
     font-size: 14px; height: 32px; line-height: 32px; padding: 0 13px;
     border-radius: 16px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
 }
-body.wa-skin #wa-sidebar .wa-chip.active { background: var(--wa-chip-active-bg); color: var(--wa-green-deep); }
+body.wa-skin #wa-sidebar .wa-chip.active { background: var(--wa-chip-active-bg); color: var(--wa-chip-active-fg); }
 body.wa-skin #wa-sidebar .wa-chip .wa-chip-count { opacity: .85; }
 
 /* chat list */
@@ -310,7 +456,7 @@ body.wa-skin #wa-sidebar .wa-row .wa-preview > span {
 body.wa-skin #wa-sidebar .wa-row .wa-preview .wa-mini-tick { color: var(--wa-tick-read); flex-shrink: 0; }
 body.wa-skin.wa-no-receipts .wa-mini-tick { display: none; }
 body.wa-skin #wa-sidebar .wa-row .wa-badge {
-    background: var(--wa-green-badge); color: #fff;
+    background: var(--wa-green-badge); color: var(--wa-on-green);
     min-width: 20px; height: 20px; border-radius: 10px;
     font-size: 12px; font-weight: 500; line-height: 20px; text-align: center;
     padding: 0 6px; box-sizing: border-box; flex-shrink: 0;
@@ -322,14 +468,14 @@ body.wa-skin #wa-sidebar .wa-row-edit {
     top: 8px; right: 10px;
     width: 26px; height: 26px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    color: var(--wa-icon); background: rgba(240, 242, 245, .95);
+    color: var(--wa-icon); background: var(--wa-pencil-bg);
     font-size: 12px; cursor: pointer; opacity: 0;
-    transition: opacity .12s ease, background-color .12s ease;
+    transition: opacity .12s ease;
     box-shadow: 0 1px 3px rgba(11, 20, 26, .2); z-index: 3;
 }
 body.wa-skin #wa-sidebar .wa-row:hover .wa-row-edit,
 body.wa-skin #wa-sidebar .wa-row:focus-within .wa-row-edit { opacity: 1; }
-body.wa-skin #wa-sidebar .wa-row-edit:hover { background: #fff; color: var(--wa-text); }
+body.wa-skin #wa-sidebar .wa-row-edit:hover { background: var(--wa-panel); color: var(--wa-text); }
 
 /* footer strip */
 body.wa-skin #wa-sidebar .wa-promo {
@@ -339,7 +485,8 @@ body.wa-skin #wa-sidebar .wa-promo {
 }
 body.wa-skin #wa-sidebar .wa-promo .wa-promo-logo {
     width: 34px; height: 34px; border-radius: 50%; background: var(--wa-green-badge);
-    display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--wa-on-green); font-size: 18px; flex-shrink: 0;
 }
 
 /* =====================================================================
@@ -364,7 +511,8 @@ body.wa-skin #sheld::before {
     background-image: url("./doodle.svg");
     background-repeat: repeat;
     background-size: 412px 412px;
-    opacity: .40;
+    opacity: var(--wa-doodle-opacity);
+    filter: var(--wa-doodle-filter);
     z-index: 0;
     pointer-events: none;
 }
@@ -500,8 +648,8 @@ body.wa-skin #chat .mes[is_user="true"] .mes_text::after { width: var(--wa-meta-
 body.wa-skin.wa-no-receipts #chat .mes[is_user="true"] .mes_text::after { width: var(--wa-meta-w); }
 
 body.wa-skin #chat .mes .mes_text em,
-body.wa-skin #chat .mes .mes_text i { color: #5e7461; }
-body.wa-skin #chat .mes .mes_text q { color: #1f7a5a; }
+body.wa-skin #chat .mes .mes_text i { color: var(--wa-em); }
+body.wa-skin #chat .mes .mes_text q { color: var(--wa-quote); }
 
 /* injected timestamp and ticks, bottom-right inside the bubble */
 body.wa-skin .wa-meta {
@@ -514,6 +662,7 @@ body.wa-skin .wa-meta {
     pointer-events: none;
 }
 body.wa-skin .wa-meta .wa-time { font-size: 11px; color: var(--wa-meta); line-height: 15px; white-space: nowrap; }
+body.wa-skin #chat .mes[is_user="true"] .wa-meta .wa-time { color: var(--wa-meta-out); }
 body.wa-skin .wa-meta .wa-ticks { display: inline-flex; align-items: center; color: var(--wa-tick-read); }
 body.wa-skin .wa-meta .wa-ticks svg { width: 16px; height: 11px; display: block; }
 body.wa-skin.wa-no-receipts .wa-meta .wa-ticks { display: none; }
@@ -527,8 +676,8 @@ body.wa-skin .wa-encryption {
     text-align: center;
 }
 body.wa-skin .wa-date-sep span {
-    background: var(--wa-panel);
-    color: var(--wa-icon);
+    background: var(--wa-sep-bg);
+    color: var(--wa-sep-fg);
     font-size: 12.5px;
     font-weight: 500;
     padding: 6px 12px;
@@ -537,8 +686,8 @@ body.wa-skin .wa-date-sep span {
     display: inline-block;
 }
 body.wa-skin .wa-encryption span {
-    background: #ffeecd;
-    color: var(--wa-icon);
+    background: var(--wa-notice-bg);
+    color: var(--wa-notice-fg);
     font-size: 12.5px;
     padding: 6px 12px;
     border-radius: var(--wa-radius);
@@ -601,7 +750,7 @@ body.wa-skin #chat .swipes-counter { color: var(--wa-text-2) !important; }
 
 /* edit textarea inside a bubble */
 body.wa-skin #chat .mes .edit_textarea {
-    background: rgba(255, 255, 255, .6); color: var(--wa-text); border-radius: 6px;
+    background: var(--wa-edit-bg); color: var(--wa-text); border-radius: 6px;
     font-family: var(--wa-font); font-size: 14.2px;
     width: 100%;
     box-sizing: border-box;
@@ -674,10 +823,10 @@ body.wa-skin .wa-compose-ico {
 }
 body.wa-skin .wa-compose-ico:hover { background: var(--wa-hover-2); }
 
-/* the text field becomes a white rounded pill */
+/* the text field becomes a rounded pill */
 body.wa-skin #send_textarea {
     order: 1; flex: 1 1 auto;
-    background: var(--wa-panel) !important;
+    background: var(--wa-input-bg) !important;
     border-radius: 8px !important;
     border: none !important;
     padding: 9px 12px !important;
@@ -734,7 +883,7 @@ body.wa-skin #chat::-webkit-scrollbar,
 body.wa-skin .wa-list::-webkit-scrollbar { width: 6px; }
 body.wa-skin #chat::-webkit-scrollbar-thumb,
 body.wa-skin .wa-list::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, .2); border-radius: 3px;
+    background: var(--wa-scroll); border-radius: 3px;
 }
 body.wa-skin #chat::-webkit-scrollbar-track,
 body.wa-skin .wa-list::-webkit-scrollbar-track { background: transparent; }
@@ -765,13 +914,13 @@ body.wa-skin .wa-modal-overlay {
 }
 body.wa-skin .wa-modal {
     width: 420px; max-width: 92vw; max-height: 92dvh;
-    background: var(--wa-panel); border-radius: 6px; overflow: hidden;
+    background: var(--wa-panel-2); border-radius: 6px; overflow: hidden;
     box-shadow: 0 18px 46px rgba(0, 0, 0, .35);
     color: var(--wa-text);
     display: flex; flex-direction: column;
 }
 body.wa-skin .wa-modal-head {
-    background: var(--wa-green-deep); color: #fff; flex-shrink: 0;
+    background: var(--wa-modal-head-bg); color: var(--wa-modal-head-fg); flex-shrink: 0;
     padding: 22px 24px 18px; font-size: 19px; font-weight: 500;
 }
 body.wa-skin .wa-modal-body { padding: 22px 24px 6px; overflow-y: auto; }
@@ -797,37 +946,37 @@ body.wa-skin .wa-modal-foot { display: flex; align-items: center; justify-conten
 body.wa-skin .wa-btn {
     border: none; background: none; cursor: pointer;
     font-size: 14px; font-weight: 500; padding: 9px 18px; border-radius: 20px;
-    font-family: inherit; transition: background-color .12s ease;
+    font-family: inherit; transition: filter .12s ease;
 }
-body.wa-skin .wa-btn.primary { background: var(--wa-green); color: #fff; }
-body.wa-skin .wa-btn.primary:hover { background: #019d7c; }
+body.wa-skin .wa-btn.primary { background: var(--wa-green); color: var(--wa-on-green); }
+body.wa-skin .wa-btn.primary:hover { filter: brightness(1.08); }
 body.wa-skin .wa-btn.ghost { color: var(--wa-green-deep); }
-body.wa-skin .wa-btn.ghost:hover { background: var(--wa-header-bg); }
-body.wa-skin .wa-btn.wa-del { color: #e3493b; margin-right: auto; }
-body.wa-skin .wa-btn.wa-del:hover { background: #fdecea; }
+body.wa-skin .wa-btn.ghost:hover { background: var(--wa-hover); }
+body.wa-skin .wa-btn.wa-del { color: var(--wa-danger); margin-right: auto; }
+body.wa-skin .wa-btn.wa-del:hover { background: var(--wa-danger-bg); }
 
 /* =====================================================================
-   REASONING BLOCK ("Thought for X seconds") → light theme
+   REASONING BLOCK ("Thought for X seconds")
    SillyTavern paints the summary pill with var(--grey30) and light body
-   text, which clashes with the white bubble it sits in.
+   text, which clashes with the bubble it sits in.
    ===================================================================== */
-body.wa-skin #chat .mes .mes_reasoning_details { color: #3b4a54; }
+body.wa-skin #chat .mes .mes_reasoning_details { color: var(--wa-text); }
 body.wa-skin #chat .mes .mes_reasoning_header {
     background-color: var(--wa-divider);
-    color: #3b4a54;
+    color: var(--wa-text);
 }
-body.wa-skin #chat .mes .mes_reasoning_header:hover { background-color: #e1e6e9; }
-body.wa-skin #chat .mes .mes_reasoning_header_title { color: #3b4a54; }
+body.wa-skin #chat .mes .mes_reasoning_header:hover { background-color: var(--wa-hover-2); }
+body.wa-skin #chat .mes .mes_reasoning_header_title { color: var(--wa-text); }
 body.wa-skin #chat .mes .mes_reasoning_arrow { color: var(--wa-text-2); }
 body.wa-skin #chat .mes .mes_reasoning {
-    border-left-color: #c7ced2;
-    color: #3b4a54;
+    border-left-color: var(--wa-divider-2);
+    color: var(--wa-text);
 }
 body.wa-skin #chat .mes .mes_reasoning_actions .mes_button,
 body.wa-skin #chat .mes .mes_reasoning_actions .edit_button { color: var(--wa-icon); }
 
 /* =====================================================================
-   SETTINGS PANEL (Extensions tab)
+   OUR OWN SETTINGS PANEL (Extensions tab)
    ===================================================================== */
 #wa-settings-block .wa-opt { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
 #wa-settings-block .wa-opt-text { margin: 8px 0; }
@@ -840,8 +989,8 @@ body.wa-skin #chat .mes .mes_reasoning_actions .edit_button { color: var(--wa-ic
    ST paints its panels from the --SmartTheme* variables, applied inline on
    <html>. Re-declaring them on the menu containers (all descendants of
    <body>) re-themes every drawer, the nav bar, the character list and the
-   popups to light — without touching #chat, which the skin styles directly
-   and which is not a descendant of these containers.
+   popups — without touching #chat, which the skin styles directly and which
+   is not a descendant of these containers.
    ===================================================================== */
 body.wa-skin #top-bar,
 body.wa-skin #top-settings-holder,
@@ -854,32 +1003,32 @@ body.wa-skin .options-content,
 body.wa-skin #character_popup,
 body.wa-skin .popup,
 body.wa-skin dialog.popup {
-    --SmartThemeBlurTintColor: #ffffff;
-    --SmartThemeChatTintColor: #ffffff;
-    --SmartThemeBodyColor: #111b21;
-    --SmartThemeBorderColor: rgba(11, 20, 26, .12);
-    --SmartThemeShadowColor: rgba(11, 20, 26, .12);
-    --SmartThemeEmColor: #3b4a54;
-    --SmartThemeQuoteColor: #008069;
-    --SmartThemeUnderlineColor: #008069;
-    --SmartThemeUserMesBlurTintColor: #d9fdd3;
-    --SmartThemeBotMesBlurTintColor: #ffffff;
-    --SmartThemeFastUIBGColor: #ffffff;
-    --black30a: rgba(11, 20, 26, .06);
-    --white30a: rgba(11, 20, 26, .06);
+    --SmartThemeBlurTintColor: var(--wa-panel-2);
+    --SmartThemeChatTintColor: var(--wa-panel-2);
+    --SmartThemeBodyColor: var(--wa-text);
+    --SmartThemeBorderColor: var(--wa-border-a);
+    --SmartThemeShadowColor: var(--wa-border-a);
+    --SmartThemeEmColor: var(--wa-text-2);
+    --SmartThemeQuoteColor: var(--wa-green-deep);
+    --SmartThemeUnderlineColor: var(--wa-green-deep);
+    --SmartThemeUserMesBlurTintColor: var(--wa-bubble-out);
+    --SmartThemeBotMesBlurTintColor: var(--wa-bubble-in);
+    --SmartThemeFastUIBGColor: var(--wa-panel-2);
+    --black30a: var(--wa-tint-a);
+    --white30a: var(--wa-tint-a);
     color: var(--SmartThemeBodyColor);
 }
 
-/* nav-bar icons and panel headers must read on the light bar */
+/* nav-bar icons and panel headers must read on the themed bar */
 body.wa-skin #top-bar,
-body.wa-skin #top-settings-holder { background-color: #f0f2f5 !important; }
-body.wa-skin #top-settings-holder .drawer-toggle .drawer-icon { color: #54656f; }
-body.wa-skin #top-settings-holder .drawer-toggle .drawer-icon.openIcon { color: #008069; }
+body.wa-skin #top-settings-holder { background-color: var(--wa-header-bg) !important; }
+body.wa-skin #top-settings-holder .drawer-toggle .drawer-icon { color: var(--wa-icon); }
+body.wa-skin #top-settings-holder .drawer-toggle .drawer-icon.openIcon { color: var(--wa-green-deep); }
 
-/* solid light panels (kill the dark blur tint bleeding through) */
+/* solid panels (kill the blur tint bleeding through) */
 body.wa-skin .drawer-content,
 body.wa-skin #character_popup,
-body.wa-skin .popup { background-color: #ffffff !important; }
+body.wa-skin .popup { background-color: var(--wa-panel-2) !important; }
 
 /* inputs and fields inside the menus */
 body.wa-skin #top-settings-holder .text_pole,
@@ -888,46 +1037,120 @@ body.wa-skin #top-settings-holder textarea,
 body.wa-skin .popup .text_pole,
 body.wa-skin .popup select,
 body.wa-skin .popup textarea {
-    background-color: #ffffff;
-    color: #111b21;
-    border: 1px solid #d1d7db;
+    background-color: var(--wa-input-bg);
+    color: var(--wa-text);
+    border: 1px solid var(--wa-divider-2);
 }
 
-/* row hovers in the character list and menus (white30a is invisible on white) */
+/* row hovers in the character list and menus */
 body.wa-skin #top-settings-holder .menu_button:hover,
 body.wa-skin #top-settings-holder .character_select:hover,
 body.wa-skin #top-settings-holder .group_select:hover,
-body.wa-skin #top-settings-holder .avatar-container:hover { background-color: #f0f2f5; }
+body.wa-skin #top-settings-holder .avatar-container:hover { background-color: var(--wa-hover); }
+
+/* ---------------------------------------------------------------------
+   Checkboxes
+   ST draws the box with --SmartThemeBodyColor (its *text* colour, which is
+   light on its own dark theme) and the tick with --SmartThemeCheckboxTickColor.
+   Once the panels are repainted, body colour is the dark text colour, so the
+   box turns black — and the tick is dark too, leaving no way to see whether
+   something is checked. Draw them explicitly instead: empty box on the input
+   surface, solid green with a light tick when checked.
+   --------------------------------------------------------------------- */
+body.wa-skin input[type="checkbox"] {
+    background-color: var(--wa-input-bg);
+    border: 1px solid var(--wa-divider-2);
+    outline: none;
+    box-shadow: none;
+    filter: none;
+    transition: none;   /* see the theme-swap guard near the top */
+}
+body.wa-skin input[type="checkbox"]:hover { border-color: var(--wa-green); }
+body.wa-skin input[type="checkbox"]:checked {
+    background-color: var(--wa-green-deep);
+    border-color: var(--wa-green-deep);
+}
+body.wa-skin input[type="checkbox"]::before {
+    box-shadow: inset 1em 1em var(--wa-on-green);
+}
+body.wa-skin input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--wa-green);
+    outline-offset: 1px;
+}
+body.wa-skin input[type="checkbox"]:disabled { opacity: .45; cursor: not-allowed; }
+
+/* radios get the same treatment so they do not look out of place */
+body.wa-skin input[type="radio"] { accent-color: var(--wa-green-deep); }
+
+/* ---------------------------------------------------------------------
+   Section headers
+   ST paints these with a 348° gradient running from --white30a through
+   --grey30a and --black70a to the quote colour. Only the first of those is
+   remapped above, so on a repainted panel the bar fades to near-black under
+   dark text. Replace the gradient with a flat messenger-green plate.
+   --------------------------------------------------------------------- */
+body.wa-skin #extensions_settings .inline-drawer-toggle.inline-drawer-header,
+body.wa-skin #extensions_settings2 .inline-drawer-toggle.inline-drawer-header,
+body.wa-skin #user-settings-block h4,
+body.wa-skin .standoutHeader {
+    background-image: none;
+    background-color: var(--wa-sect-bg);
+    color: var(--wa-sect-fg);
+    border: 1px solid var(--wa-border-a);
+    border-radius: 8px;
+    text-shadow: none;
+    transition: none;   /* ST sets `transition: all`; see the theme-swap guard */
+}
+body.wa-skin #extensions_settings .inline-drawer-toggle.inline-drawer-header b,
+body.wa-skin #extensions_settings2 .inline-drawer-toggle.inline-drawer-header b,
+body.wa-skin #user-settings-block h4,
+body.wa-skin .standoutHeader,
+body.wa-skin .standoutHeader b,
+body.wa-skin .standoutHeader span,
+body.wa-skin .standoutHeader small,
+body.wa-skin .standoutHeader .inline-drawer-icon,
+body.wa-skin #extensions_settings .inline-drawer-toggle.inline-drawer-header .inline-drawer-icon,
+body.wa-skin #extensions_settings2 .inline-drawer-toggle.inline-drawer-header .inline-drawer-icon {
+    color: var(--wa-sect-fg);
+}
+/* ST's hover is `filter: brightness(150%)`, which washes a light plate out */
+body.wa-skin #extensions_settings .inline-drawer-toggle.inline-drawer-header:hover,
+body.wa-skin #extensions_settings2 .inline-drawer-toggle.inline-drawer-header:hover,
+body.wa-skin .standoutHeader.inline-drawer-header:hover {
+    filter: none;
+    background-color: var(--wa-sect-hover);
+}
+body.wa-skin .standoutHeader ~ .inline-drawer-content {
+    border: 1px solid var(--wa-border-a);
+    background-color: var(--wa-tint-a);
+}
 
 /* ---------------------------------------------------------------------
    Prompt Manager (AI Response Configuration → Prompts)
    ST paints parts of this list with the --white*a alpha vars, which only
-   read on a dark panel: --white50a/--white20a stay pure white (invisible on
-   the white drawer) and --white30a is remapped above to a 6%-alpha dark
-   that works as a hover tint but not as text. Presets with many toggled-off
-   entries would otherwise be almost entirely invisible.
+   read on a dark panel: --white50a/--white20a stay pure white and --white30a
+   is remapped above to a faint tint that works as a hover but not as text.
+   Presets with many toggled-off entries would otherwise be nearly invisible.
    --------------------------------------------------------------------- */
-body.wa-skin #completion_prompt_manager .completion_prompt_manager_header { color: #54656f; }
+body.wa-skin #completion_prompt_manager .completion_prompt_manager_header { color: var(--wa-icon); }
 
-/* role icons and disabled prompts: #667781 is clearly muted against the
-   enabled #111b21, yet still 4.6:1 on white, so it passes WCAG AA. */
 body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt .completion_prompt_manager_prompt_name .fa-solid,
 body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt_disabled .completion_prompt_manager_prompt_name,
-body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt_disabled .completion_prompt_manager_prompt_name .prompt-manager-inspect-action { color: #667781; }
+body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt_disabled .completion_prompt_manager_prompt_name .prompt-manager-inspect-action { color: var(--wa-text-2); }
 
 /* ...and the row outline --white20a leaves invisible */
-body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt.completion_prompt_manager_prompt_disabled { border-color: #e9edef; }
+body.wa-skin #completion_prompt_manager #completion_prompt_manager_list .completion_prompt_manager_prompt.completion_prompt_manager_prompt_disabled { border-color: var(--wa-divider); }
 
-/* the row and header control icons carry a black glow meant for a dark panel */
+/* the row and header control icons carry a glow meant for a dark panel */
 body.wa-skin #completion_prompt_manager #completion_prompt_manager_list li.completion_prompt_manager_prompt span span span,
 body.wa-skin #completion_prompt_manager .completion_prompt_manager_header_advanced span { filter: none; }
 
-/* at 0.4 opacity the dark icons wash out on white — lift the resting state */
+/* at 0.4 opacity the icons wash out — lift the resting state */
 body.wa-skin #completion_prompt_manager #completion_prompt_manager_list li.completion_prompt_manager_prompt span span span { opacity: 0.65; }
 
 /* =====================================================================
    OPTIONAL COMPANIONS
-   Light-theme touch-ups for popular extensions, applied only if they are
+   Light touch-ups for popular extensions, applied only if they are
    installed. Harmless otherwise.
    ===================================================================== */
 
@@ -942,24 +1165,17 @@ body.wa-skin #chat .st-choices-container {
     background: var(--wa-header-bg);
     border: 1px solid var(--wa-hover-2);
 }
-body.wa-skin #chat .st-choices-btn {
-    background: var(--wa-panel);
-    border: 1px solid var(--wa-divider-2);
-    color: var(--wa-text);
-}
-body.wa-skin #chat .st-choices-btn:hover {
-    background: var(--wa-hover);
-    border-color: #c3cbd0;
-    box-shadow: 0 1px 3px rgba(11, 20, 26, .12);
-}
+body.wa-skin #chat .st-choices-btn,
 body.wa-skin #chat .st-choices-copy {
-    background: var(--wa-panel);
+    background: var(--wa-panel-2);
     border: 1px solid var(--wa-divider-2);
-    color: var(--wa-icon);
 }
+body.wa-skin #chat .st-choices-btn { color: var(--wa-text); }
+body.wa-skin #chat .st-choices-copy { color: var(--wa-icon); }
+body.wa-skin #chat .st-choices-btn:hover,
 body.wa-skin #chat .st-choices-copy:hover {
     background: var(--wa-hover);
-    border-color: #c3cbd0;
+    border-color: var(--wa-divider-2);
     box-shadow: 0 1px 3px rgba(11, 20, 26, .12);
 }
 body.wa-skin #chat .st-choices-copy.st-choices-copied { color: var(--wa-green-deep); }
@@ -968,14 +1184,14 @@ body.wa-skin #chat .st-choices-regen {
     border: none;
     color: var(--wa-green-deep);
 }
-body.wa-skin #chat .st-choices-regen:hover { color: #006a56; opacity: 1; }
+body.wa-skin #chat .st-choices-regen:hover { filter: brightness(1.15); opacity: 1; }
 
 /* ---- Guided Generations ----
    GG injects #gg-action-button-container into #send_form right after
    #nonQRFormItems. ST gives #nonQRFormItems order:25 while GG's container
    keeps order:0, so without an explicit order the button bar renders to the
    LEFT of the composer. Push it past the composer, pin it to a row of its
-   own, then repaint the bordered dark buttons as flat icon buttons. */
+   own, then repaint the bordered buttons as flat icon buttons. */
 body.wa-skin #gg-action-button-container {
     order: 30;              /* after #nonQRFormItems (order: 25) */
     flex: 0 0 100%;         /* own row, below the composer */
@@ -1013,7 +1229,7 @@ body.wa-skin #gg-action-button-container .pg-guide-counter {
     margin-left: 4px;
     color: inherit;
 }
-body.wa-skin #pg_counter_badge { background-color: var(--wa-green); }
+body.wa-skin #pg_counter_badge { background-color: var(--wa-green); color: var(--wa-on-green); }
 
 /* the QR spacer keeps the action buttons pinned right */
 body.wa-skin #gg-qr-container { margin: 0 6px; }
@@ -1023,49 +1239,49 @@ body.wa-skin #gg-qr-container #qr--bar {
     padding: 0 !important;
 }
 body.wa-skin #send_form .qr--button {
-    background: var(--wa-panel);
+    background: var(--wa-panel-2);
     border: 1px solid var(--wa-divider-2);
     color: var(--wa-text);
     border-radius: 14px;
 }
-body.wa-skin #send_form .qr--button:hover { background: var(--wa-hover); border-color: #c3cbd0; }
+body.wa-skin #send_form .qr--button:hover { background: var(--wa-hover); }
 
 /* GG's dropdowns are appended to <body>, so they miss the menu var overrides
-   above; give them the same light palette plus a solid white surface. */
+   above; give them the same palette plus a solid surface. */
 body.wa-skin #gg_tools_menu,
 body.wa-skin #pg_tools_menu,
 body.wa-skin .gg-tools-menu,
 body.wa-skin #persistent-guides-menu,
 body.wa-skin .gg-popup-content,
 body.wa-skin .gg-group-picker-dialog {
-    --SmartThemeBlurTintColor: #ffffff;
-    --SmartThemeChatTintColor: #ffffff;
-    --SmartThemeBg: #ffffff;
-    --SmartThemeBodyColor: #111b21;
-    --SmartThemeBorderColor: rgba(11, 20, 26, .12);
-    --SmartThemeShadowColor: rgba(11, 20, 26, .12);
-    --SmartThemeHover: #f0f2f5;
-    --SmartThemeUi: #111b21;
-    --SmartThemeAccentColor: #008069;
-    --SmartThemeQuoteColor: #008069;
-    --SmartThemeUserMesBlurTintColor: #d9fdd3;
-    --SmartThemeBotMesBlurTintColor: #ffffff;
-    --black30a: rgba(11, 20, 26, .06);
-    --white30a: rgba(11, 20, 26, .06);
-    background-color: #ffffff !important;
-    color: #111b21;
+    --SmartThemeBlurTintColor: var(--wa-panel-2);
+    --SmartThemeChatTintColor: var(--wa-panel-2);
+    --SmartThemeBg: var(--wa-panel-2);
+    --SmartThemeBodyColor: var(--wa-text);
+    --SmartThemeBorderColor: var(--wa-border-a);
+    --SmartThemeShadowColor: var(--wa-border-a);
+    --SmartThemeHover: var(--wa-hover);
+    --SmartThemeUi: var(--wa-text);
+    --SmartThemeAccentColor: var(--wa-green-deep);
+    --SmartThemeQuoteColor: var(--wa-green-deep);
+    --SmartThemeUserMesBlurTintColor: var(--wa-bubble-out);
+    --SmartThemeBotMesBlurTintColor: var(--wa-bubble-in);
+    --black30a: var(--wa-tint-a);
+    --white30a: var(--wa-tint-a);
+    background-color: var(--wa-panel-2) !important;
+    color: var(--wa-text);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     box-shadow: 0 2px 10px rgba(11, 20, 26, .16);
-    border: 1px solid #e9edef;
+    border: 1px solid var(--wa-divider);
     font-family: var(--wa-font);
 }
 body.wa-skin .gg-tools-menu > .interactable:hover,
 body.wa-skin .gg-tools-menu .list-group-item:hover,
 body.wa-skin .persistent-guide-item:hover,
 body.wa-skin .persistent-guides-header:hover {
-    background-color: #f0f2f5;
-    color: #111b21;
+    background-color: var(--wa-hover);
+    color: var(--wa-text);
 }
 
 /* =====================================================================

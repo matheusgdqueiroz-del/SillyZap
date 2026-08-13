@@ -81,6 +81,10 @@ const TXT = {
     // settings panel
     settingsTitle: 'SillyZap — WhatsApp Web Skin',
     optEnabled: 'Enable the skin',
+    optTheme: 'Theme',
+    themeLight: 'Light',
+    themeDark: 'Dark',
+    themeSystem: 'Match system',
     optSidebar: 'Show the chat list sidebar',
     optDecoys: 'Show sample contacts in the list',
     optEncryption: 'Show the end-to-end encryption notice',
@@ -294,6 +298,7 @@ function fileToDataURL(file, size = 120) {
    ===================================================================== */
 const DEFAULTS = {
     enabled: true,
+    theme: 'light',                 // 'light' | 'dark' | 'system'
     showSidebar: true,
     showDecoys: true,
     showEncryption: true,
@@ -1033,6 +1038,17 @@ function labeledText(label, value, onChange) {
     return el('div', { class: 'wa-opt-text' }, [el('small', { text: label }), input]);
 }
 
+function labeledSelect(label, value, options, onChange) {
+    const select = el('select', { class: 'text_pole' });
+    for (const [val, text] of options) {
+        const option = el('option', { value: val, text });
+        if (val === value) option.selected = true;
+        select.appendChild(option);
+    }
+    select.addEventListener('change', () => onChange(select.value));
+    return el('div', { class: 'wa-opt-text' }, [el('small', { text: label }), select]);
+}
+
 function hint(text) {
     return el('small', { class: 'wa-hint', text });
 }
@@ -1056,6 +1072,11 @@ function buildSettingsPanel() {
         ]),
         el('div', { class: 'inline-drawer-content' }, [
             labeledCheckbox(TXT.optEnabled, s.enabled, (v) => { settings().enabled = v; saveSettings(); applyEnabled(); }),
+            labeledSelect(TXT.optTheme, s.theme, [
+                ['light', TXT.themeLight],
+                ['dark', TXT.themeDark],
+                ['system', TXT.themeSystem],
+            ], (v) => { settings().theme = v; saveSettings(); applyTheme(); }),
             labeledCheckbox(TXT.optSidebar, s.showSidebar, (v) => { settings().showSidebar = v; saveSettings(); applySidebarVisibility(); }),
             labeledCheckbox(TXT.optDecoys, s.showDecoys, (v) => { settings().showDecoys = v; saveSettings(); refreshChrome(); }),
             labeledCheckbox(TXT.optEncryption, s.showEncryption, (v) => { settings().showEncryption = v; saveSettings(); processChat(); }),
@@ -1082,10 +1103,56 @@ function applySidebarVisibility() {
     document.body.classList.toggle('wa-no-sidebar', !settings().showSidebar);
 }
 
+/* ---------------------------------------------------------------------
+   Theme. `wa-dark` swaps the whole --wa-* palette in style.css; nothing
+   else needs to know which one is active.
+   --------------------------------------------------------------------- */
+let darkQuery = null;
+let themeSwapTimer = null;
+
+function systemPrefersDark() {
+    try { return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); }
+    catch (e) { return false; }
+}
+
+function applyTheme() {
+    const s = settings();
+    const dark = !!s.enabled && (s.theme === 'dark' || (s.theme === 'system' && systemPrefersDark()));
+    const body = document.body;
+
+    /* Chromium keeps a stale background-color when the custom property behind
+       it changes while a non-zero `transition` covers that property — the
+       element never repaints. Swap the palette with transitions suppressed
+       (style.css defines .wa-theme-switching), flush styles, then restore. */
+    clearTimeout(themeSwapTimer);
+    body.classList.add('wa-theme-switching');
+    body.classList.toggle('wa-dark', dark);
+    void body.offsetHeight;                    // force the recalc while pinned
+
+    // rAF is throttled to a standstill in background tabs, so a timeout backs
+    // it up — leaving the guard on would kill every transition on the page.
+    const release = () => { clearTimeout(themeSwapTimer); body.classList.remove('wa-theme-switching'); };
+    requestAnimationFrame(() => requestAnimationFrame(release));
+    themeSwapTimer = setTimeout(release, 150);
+}
+
+/** Follow the OS while the theme is set to "Match system". */
+function watchSystemTheme() {
+    if (darkQuery) return;
+    try {
+        darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const onChange = () => { if (settings().theme === 'system') applyTheme(); };
+        if (darkQuery.addEventListener) darkQuery.addEventListener('change', onChange);
+        else if (darkQuery.addListener) darkQuery.addListener(onChange);   // older Safari
+    } catch (e) { darkQuery = null; }
+}
+
 function applyEnabled() {
     if (!settings().enabled) { destroySkin(); return; }
 
     document.body.classList.add('wa-skin');
+    applyTheme();
+    watchSystemTheme();
     applyMetaWidths();
     applyToggleClasses();
     applySidebarVisibility();
@@ -1099,7 +1166,7 @@ function applyEnabled() {
 }
 
 function destroySkin() {
-    document.body.classList.remove('wa-skin', 'wa-show-settings', 'wa-generating', 'wa-no-sidebar', 'wa-no-receipts');
+    document.body.classList.remove('wa-skin', 'wa-dark', 'wa-theme-switching', 'wa-show-settings', 'wa-generating', 'wa-no-sidebar', 'wa-no-receipts');
     closeContactEditor();
     ['wa-rail', 'wa-sidebar', 'wa-chat-header'].forEach(id => document.getElementById(id)?.remove());
     clearInjected(document);
@@ -1109,6 +1176,7 @@ function destroySkin() {
     document.body.style.removeProperty('--wa-meta-w');
     document.body.style.removeProperty('--wa-meta-w-out');
     clearTimeout(typingTimer);
+    clearTimeout(themeSwapTimer);
 }
 
 /* =====================================================================

@@ -22,6 +22,7 @@ That's it — the skin turns on by default.
 
 ## What it does
 
+- **Light and dark** — both palettes are faithful to the real thing. Light by default; switch to dark, or let it follow your operating system.
 - **Full messenger layout** — icon rail, chat list sidebar, conversation header with avatar and status line, and a composer with emoji/attach/sticker/mic buttons that keep their real SillyTavern functions.
 - **Real bubbles** — sent messages on the right in green, received on the left in white, with tails, sender grouping, timestamps, blue read receipts and day separators.
 - **Group chats** — each incoming bubble in a SillyTavern group is labelled with its speaker, colour-coded per character.
@@ -47,6 +48,7 @@ Press **Esc** to hide them again.
 | Setting | What it does |
 | --- | --- |
 | Enable the skin | Master switch. Off restores stock SillyTavern immediately, no reload needed. |
+| Theme | Light (default), Dark, or Match system. Switches live and repaints SillyTavern's menus with it. |
 | Show the chat list sidebar | Hide the rail and list to give the conversation the full window. |
 | Show sample contacts in the list | Turn off to show only your real, open chat. |
 | Show the end-to-end encryption notice | The yellow banner at the top of a conversation. |
@@ -61,8 +63,8 @@ Contact name and photo for the **open chat** are edited separately: click the av
 
 - Character **expression sprites** are hidden — they have nowhere sensible to go in a messenger layout. Turn the skin off if you want them back.
 - Photos you upload for contacts are cropped to 120×120 and stored inside your SillyTavern settings, so keep the count reasonable.
-- The skin is light-theme only by design; it replicates a specific look.
 - Below 860px wide the rail and list hide themselves automatically and the conversation goes full-screen.
+- Every colour comes from a `--wa-*` custom property declared in two blocks at the top of `style.css`. If you want to restyle something, change a variable rather than a literal — that keeps both themes in step.
 
 ## Requirements
 
